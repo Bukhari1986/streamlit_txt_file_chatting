@@ -57,7 +57,7 @@ if "snapshots" not in st.session_state:
 	st.session_state.snapshots = {}  # name -> {"history": ..., "timestamp": ...}
 
 # Sidebar: API key and essential options (kept minimal to avoid scrolling)
-st.set_page_config(page_title="Doc Chat", layout="wide")  # set page title and layout
+st.set_page_config(page_title="Chat with TXT files", layout="wide")  # set page title and layout
 st.sidebar.title("Settings")  # sidebar title
 api_key = st.sidebar.text_input("OpenAI API Key", type="password")  # API key input (visible)
 chat_model = st.sidebar.selectbox(  # select chat model (visible)
