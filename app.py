@@ -3,7 +3,7 @@ import openai
 import numpy as np
 from typing import List
 import time
-import uuid
+import uuid  # import uuid for unique snapshot names
 
 # Small helper functions and cached embeddings
 def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
@@ -87,8 +87,8 @@ with st.sidebar.expander("Advanced (click to expand)", expanded=False):  # colla
 	st.markdown("Environment:")  # environment note
 	st.caption("Recommended: create a .venv and pip install the packages below.")  # short note about venv
 
-# Add attribution link in a concise form (keeps sidebar short, visible below advanced when expanded)
-st.sidebar.markdown("Created by Mr Hezbullah Shah — [www.MrHezbu.com](http://www.MrHezbu.com)")  # author attribution with link
+# Add concise attribution with prefix
+st.sidebar.markdown("Created by: [Mr Hezbullah Shah](http://www.MrHezbu.com)")  # author attribution as linked name
 
 # Main UI
 st.title("Chat with your TXT Document")  # main title
@@ -183,5 +183,5 @@ else:  # when a document has been uploaded and decoded
 				st.markdown(f"**Assistant:** {text}")  # format assistant message
 
 st.markdown("---")  # divider
-st.markdown("Created by Mr Hezbullah Shah — [www.MrHezbu.com](http://www.MrHezbu.com)")  # footer attribution with link
+st.markdown("Created by: [Mr Hezbullah Shah](http://www.MrHezbu.com)")  # footer attribution with prefix
 st.caption("Required packages: streamlit, openai, numpy. Example: python -m venv .venv && .venv\\Scripts\\pip install -U pip && .venv\\Scripts\\pip install streamlit openai numpy")  # caption with install hint
