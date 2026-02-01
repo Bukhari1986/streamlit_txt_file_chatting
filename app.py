@@ -60,6 +60,18 @@ if "snapshots" not in st.session_state:
 st.set_page_config(page_title="Doc Chat", layout="wide")
 st.sidebar.title("Settings")
 api_key = st.sidebar.text_input("OpenAI API Key", type="password")
+chat_model = st.sidebar.selectbox(
+	"Chat model",
+	options=["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o"],
+	index=0,
+	help="Select chat/completion model. Default: gpt-3.5-turbo"
+)
+embedding_model = st.sidebar.selectbox(
+	"Embedding model",
+	options=["text-embedding-3-small", "text-embedding-3-large"],
+	index=0,
+	help="Select embedding model. Default: text-embedding-3-small"
+)
 top_k = st.sidebar.slider("Top document chunks to use", min_value=1, max_value=10, value=3)
 temperature = st.sidebar.slider("Temperature", 0.0, 1.0, 0.2)
 chunk_size = st.sidebar.number_input("Chunk size (chars)", value=1000, step=100)
@@ -74,6 +86,9 @@ if st.sidebar.button("Clear snapshots"):
 
 st.sidebar.markdown("Environment:")
 st.sidebar.caption("Recommended: create a .venv and pip install the packages below.")
+
+# <-- added: attribution in sidebar -->
+st.sidebar.markdown("Created by Mr Hezbullah Shah — [www.MrHezbu.com](http://www.MrHezbu.com)")
 
 # Main UI
 st.title("Chat with your TXT Document")
@@ -100,7 +115,7 @@ else:
 	# Chunk and embed (cached)
 	chunks = chunk_text(document_text, chunk_size=chunk_size, overlap=overlap)
 	with st.spinner("Computing/Loading embeddings (cached)..."):
-		embs = get_embeddings(chunks, api_key or "no_key")
+		embs = get_embeddings(chunks, api_key or "no_key", model=embedding_model)
 	# Quick stats
 	st.write(f"Document split into {len(chunks)} chunks. Embedding dim: {embs.shape[1] if embs.size else 0}")
 
@@ -134,7 +149,7 @@ else:
 		else:
 			with st.spinner("Generating answer..."):
 				# embed query
-				q_emb = get_embeddings([question], api_key)[0:1]  # shape (1, dim)
+				q_emb = get_embeddings([question], api_key, model=embedding_model)[0:1]  # shape (1, dim)
 				sims = cosine_sim(embs, q_emb).flatten()  # (n_chunks,)
 				top_idx = list(np.argsort(-sims)[:top_k])
 				# Build prompt
@@ -147,7 +162,7 @@ else:
 					user_prompt = f"{recent}\n\n{user_prompt}"
 				# Query OpenAI chat
 				try:
-					answer = query_openai_chat(api_key, system, user_prompt, temperature=temperature)
+					answer = query_openai_chat(api_key, system, user_prompt, temperature=temperature, model=chat_model)
 				except Exception as e:
 					st.error(f"OpenAI API error: {e}")
 					answer = ""
@@ -168,4 +183,5 @@ else:
 				st.markdown(f"**Assistant:** {text}")
 
 st.markdown("---")
+st.markdown("Created by Mr Hezbullah Shah — [www.MrHezbu.com](http://www.MrHezbu.com)")
 st.caption("Required packages: streamlit, openai, numpy. Example: python -m venv .venv && .venv\\Scripts\\pip install -U pip && .venv\\Scripts\\pip install streamlit openai numpy")
